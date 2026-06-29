@@ -93,7 +93,7 @@ export default function HeroSlider() {
                 className="object-cover object-center"
                 unoptimized
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent md:bg-gradient-to-r md:from-white/95 md:via-white/75 md:to-transparent bg-white/80" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent md:bg-gradient-to-r md:from-white/15 md:via-white/35 md:to-transparent bg-white/80" />
             </div>
 
             {/* Content Container */}
