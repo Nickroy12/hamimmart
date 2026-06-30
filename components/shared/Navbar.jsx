@@ -299,8 +299,8 @@ export default function Navbar() {
           ) : (
             // NOT LOGGED IN: Show Login Icon Link
             <Link 
-              href="/auth/signUp" 
-              className={`p-2 transition-colors ${isActive('/auth/signUp') ? 'text-[#4CBB17]' : 'text-gray-600 hover:text-[#4CBB17]'}`} 
+              href="/auth/account" 
+              className={`p-2 transition-colors ${isActive('/auth/account') ? 'text-[#4CBB17]' : 'text-gray-600 hover:text-[#4CBB17]'}`} 
               aria-label="User Account"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
