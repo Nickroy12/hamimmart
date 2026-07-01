@@ -8,8 +8,8 @@ const AuthPage = () => {
   // true = Sign Up, false = Sign In
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // Form states
-  const [formData, setFormData] = useState({
+  // Initial empty form state
+  const initialFormState = {
     fullName: '',
     email: '',
     phone: '',
@@ -17,7 +17,10 @@ const AuthPage = () => {
     password: '',
     confirmPassword: '',
     agreeTerms: false,
-  });
+  };
+
+  // Form states
+  const [formData, setFormData] = useState(initialFormState);
 
   // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +60,12 @@ const AuthPage = () => {
 
         alert("Account created successfully!");
         console.log('Sign Up Success:', data);
+        
+        // Form Reset after successful Sign Up
+        setFormData(initialFormState);
+        setShowPassword(false);
+        setShowConfirmPassword(false);
+        
       } catch (err) {
         console.error(err);
         alert("An unexpected error occurred.");
@@ -76,6 +85,11 @@ const AuthPage = () => {
 
         alert("Signed in successfully!");
         console.log('Sign In Success:', data);
+        
+        // Form Reset after successful Sign In
+        setFormData(initialFormState);
+        setShowPassword(false);
+        
       } catch (err) {
         console.error(err);
         alert("An unexpected error occurred.");
@@ -86,6 +100,7 @@ const AuthPage = () => {
   // টগল পরিবর্তন করার ফাংশন
   const handleToggle = (targetState) => {
     setIsSignUp(targetState);
+    setFormData(initialFormState); // Toggle করার সময়ও ফর্ম ইনপুট ক্লিয়ার হবে
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
@@ -137,7 +152,7 @@ const AuthPage = () => {
 
           {/* TOGGLE SWITCH */}
           <div className="flex justify-center md:justify-start">
-            <div className="relative p-1 -[#FF5722] rounded-lg flex w-64 shadow-inner">
+            <div className="relative p-1 rounded-lg flex w-64 shadow-inner">
               {/* Sliding Background */}
               <div 
                 className={`absolute top-1 bottom-1 rounded-md bg-[#FF5722]  shadow-sm transition-all duration-300 ease-out w-[calc(50%-4px)] ${
@@ -285,14 +300,14 @@ const AuthPage = () => {
                     onChange={handleChange}
                     className="appearance-none rounded-md block w-full px-3 py-2 pr-12 border border-gray-200 font-light placeholder-gray-300 text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#FF5722] focus:border-[#FF5722] sm:text-sm"
                     placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 text-xs font-normal text-gray-400 hover:text-gray-600 select-none focus:outline-none"
-                >
-                  {showConfirmPassword ? "Hide" : "Show"}
-                </button>
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 text-xs font-normal text-gray-400 hover:text-gray-600 select-none focus:outline-none"
+                  >
+                    {showConfirmPassword ? "Hide" : "Show"}
+                  </button>
                 </div>
               </div>
             )}
