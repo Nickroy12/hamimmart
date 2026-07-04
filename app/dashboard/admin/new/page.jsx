@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { addGrocery } from '@/lib/action/action';
 import React, { useState } from 'react';
 
@@ -9,11 +9,12 @@ export default function GroceryUploadForm() {
     quantity: '',
     price: '',
     isStockout: false,
+    hasDiscount: false, 
+    discount: '',      
   });
   
   const [imageFile, setImageFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
- 
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -39,7 +40,7 @@ export default function GroceryUploadForm() {
     setIsUploading(true);
 
     try {
-      const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY; // <-- Replace with your real API key
+      const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY; 
       const imgbbFormData = new FormData();
       imgbbFormData.append('image', imageFile);
 
@@ -60,12 +61,12 @@ export default function GroceryUploadForm() {
           price: Number(formData.price) || 0,
           image: uploadedImageUrl,
           rating: 5.0,             
-         
-          status: formData.isStockout ? "soldout" : "in-stock"
+          status: formData.isStockout ? "soldout" : "in-stock",
+          discount: formData.hasDiscount ? (Number(formData.discount) || 0) : 0 
         };
 
-       
-        addGrocery(finalProductData)
+        await addGrocery(finalProductData);
+        alert("Item uploaded successfully!");
       } else {
         alert("Image upload failed: " + data.error.message);
       }
@@ -78,7 +79,7 @@ export default function GroceryUploadForm() {
   };
 
   return (
-    <div className="max-w-xl mx-auto my-8 p-6 bg-white border border-gray-200 rounded-xl shadow-md font-sans">
+    <div className="w-10/12 mx-auto my-8 p-6 bg-white border border-gray-200 rounded-xl shadow-md font-sans">
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Upload Grocery Item (Admin)</h2>
       
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -93,7 +94,7 @@ export default function GroceryUploadForm() {
             onChange={handleChange} 
             required 
             placeholder="e.g., Organic Bananas"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EA580C] focus:border-[#EA580C]"
           />
         </div>
 
@@ -107,7 +108,7 @@ export default function GroceryUploadForm() {
             required 
             placeholder="Describe the item..."
             rows="3"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EA580C] focus:border-[#EA580C]"
           />
         </div>
 
@@ -123,7 +124,7 @@ export default function GroceryUploadForm() {
               required 
               min="0"
               placeholder="50"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EA580C] focus:border-[#EA580C]"
             />
           </div>
           
@@ -138,7 +139,7 @@ export default function GroceryUploadForm() {
               min="0"
               step="0.01"
               placeholder="2.99"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EA580C] focus:border-[#EA580C]"
             />
           </div>
         </div>
@@ -151,27 +152,72 @@ export default function GroceryUploadForm() {
             accept="image/*"
             onChange={handleFileChange} 
             required
-            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#EA580C] hover:file:bg-orange-100 cursor-pointer"
           />
         </div>
 
-        {/* Soldout / Stockout Toggle */}
-        <div className="flex items-center gap-3 mt-2 select-none">
-          <input 
-            type="checkbox" 
-            id="isStockout"
-            name="isStockout" 
-            checked={formData.isStockout} 
-            onChange={handleChange} 
-            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 cursor-pointer"
-          />
-          <label 
-            htmlFor="isStockout" 
-            className={`text-sm font-semibold cursor-pointer transition-colors duration-200 ${formData.isStockout ? 'text-red-600' : 'text-gray-700'}`}
-          >
-            Mark as Sold Out / Stock Out
-          </label>
+        {/* Toggles Container */}
+        <div className="flex flex-col gap-4 mt-2 select-none">
+          
+          {/* Soldout / Stockout Toggle Switch */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-100">
+            <label 
+              htmlFor="isStockout" 
+              className={`text-sm font-semibold cursor-pointer transition-colors duration-200 ${formData.isStockout ? 'text-[#EA580C]' : 'text-gray-700'}`}
+            >
+              Mark as Sold Out / Stock Out
+            </label>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                id="isStockout"
+                name="isStockout" 
+                checked={formData.isStockout} 
+                onChange={handleChange} 
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EA580C]"></div>
+            </label>
+          </div>
+
+          {/* Discount Toggle Switch */}
+          <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-100">
+            <label 
+              htmlFor="hasDiscount" 
+              className={`text-sm font-semibold cursor-pointer transition-colors duration-200 ${formData.hasDiscount ? 'text-[#EA580C]' : 'text-gray-700'}`}
+            >
+              Apply Discount / Offer
+            </label>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                id="hasDiscount"
+                name="hasDiscount" 
+                checked={formData.hasDiscount} 
+                onChange={handleChange} 
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#EA580C]"></div>
+            </label>
+          </div>
         </div>
+
+        {/* Conditional Discount Input Field */}
+        {formData.hasDiscount && (
+          <div className="transition-all duration-300 ease-in-out">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Discount Percentage (%) or Amount</label>
+            <input 
+              type="number" 
+              name="discount" 
+              value={formData.discount} 
+              onChange={handleChange} 
+              required={formData.hasDiscount} 
+              min="0"
+              placeholder="e.g., 10"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EA580C] focus:border-[#EA580C]"
+            />
+          </div>
+        )}
 
         {/* Submit Button */}
         <button 
@@ -180,14 +226,12 @@ export default function GroceryUploadForm() {
           className={`w-full py-2.5 px-4 rounded-md text-white font-bold transition-colors duration-200 shadow-sm ${
             isUploading 
               ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+              : 'bg-[#EA580C] hover:bg-[#d64f0b] active:bg-[#bd4408]'
           }`}
         >
           {isUploading ? 'Uploading Image...' : 'Generate & Upload Item'}
         </button>
       </form>
-
-      {/* Live Output Preview */}
 
     </div>
   );
