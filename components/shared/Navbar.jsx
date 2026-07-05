@@ -158,6 +158,11 @@ export default function Navbar() {
                           Edible Oil & Ghee
                         </Link>
                       </li>
+                             <li>
+                        <Link href="/category/peyajAluRasun" className={`block transition-colors ${isActive('/category/peyajAluRasun') ? 'text-[#4CBB17] font-normal' : 'text-gray-500 hover:text-[#4CBB17]'}`}>
+                         peyaj Alu Rasun
+                        </Link>
+                      </li>
                     </ul>
                   </div>
                   
@@ -172,6 +177,14 @@ export default function Navbar() {
                       <li>
                         <Link href="/category/personal-care" className={`block transition-colors ${isActive('/category/personal-care') ? 'text-[#4CBB17] font-normal' : 'text-gray-500 hover:text-[#4CBB17]'}`}>
                           Soap, Shampoo & Toiletries
+                        </Link>
+                      </li>
+     
+               
+                
+                      <li>
+                        <Link href="/category/DryFruit" className={`block transition-colors ${isActive('/category/DryFruit') ? 'text-[#4CBB17] font-normal' : 'text-gray-500 hover:text-[#4CBB17]'}`}>
+                         Dry Fruit
                         </Link>
                       </li>
                       <li>
