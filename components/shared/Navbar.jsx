@@ -233,7 +233,7 @@ export default function Navbar() {
           
           {/* Cart Icon Link */}
 
-          <CartDrawer/>
+          <CartDrawer user={user}/>
 
           {/* DYNAMIC USER PROFILE / LOGIN SECTION */}
           {isPending ? (

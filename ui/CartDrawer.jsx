@@ -1,17 +1,42 @@
 'use client'
 import { useState } from "react";
 import Image from "next/image";
-import { useCart } from "@/context/CartContext"; // ১. আমাদের তৈরি করা কার্ট হুকটি ইমপোর্ট করুন
+import { useCart } from "@/context/CartContext"; 
+import { createOrder } from "@/lib/action/action";
+// import { createOrder } from "@/lib/actions/cart.actions"; // আপনার অ্যাকশন লাইব্রেরির সঠিক পাথ দিন
 
-export function CartDrawer() {
+export function CartDrawer({user}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { cart } = useCart(); // ২. গ্লোবাল কার্ট স্টেটটি নিয়ে আসুন
+  const [isLoading, setIsLoading] = useState(false); 
+  const { cart, clearCart } = useCart(); 
 
-  // কার্টের মোট আইটেম সংখ্যা হিসাব (যদি একেকটি প্রোডাক্ট ৩টি করে থাকে, তবে মোট কোয়ান্টিটি যোগ হবে)
+
+  // কার্টের মোট আইটেম সংখ্যা হিসাব
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
 
   // কার্টের মোট ডিসকাউন্টেড প্রাইস হিসাব (সাবটোটাল)
   const subtotal = cart.reduce((total, item) => total + item.totalPrice, 0);
+
+  // অ্যাকশন লাইব্রেরি কল করার হ্যান্ডলার ফাংশন (Option 2)
+  const handleCheckout = async () => {
+    if (cart.length === 0) return;
+
+    setIsLoading(true);
+          // ১. প্রতিটি আইটেমের ভেতরেই totalAmount ও totalQty ঢুকিয়ে ফ্ল্যাট অ্যারে তৈরি
+      const formattedItems = cart.map((item) => ({
+        name: item.productName,
+        userEmail: user.email,
+        quantity: item.quantity,
+        price: item.totalPrice,
+        totalAmount: subtotal, // গ্লোবাল সাবটোটাল প্রতিটি আইটেমে পুশ হচ্ছে
+        totalQty: totalItems,   // গ্লোবাল কোয়ান্টিটি প্রতিটি আইটেমে পুশ হচ্ছে
+      }));
+
+      // ২. কোনো অবজেক্ট র্যাপ বা ডিস্ট্রাকচার না করে সরাসরি শুধু formattedItems অ্যারে পাস
+      const result = await createOrder(formattedItems);
+      console.log(result , 'form')
+
+  };
 
   return (
     <>
@@ -24,7 +49,6 @@ export function CartDrawer() {
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"></path>
         </svg>
-        {/* লাইভ কাউন্টার */}
         {totalItems > 0 && (
           <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-semibold leading-none text-white bg-[#EA580C] rounded-full transform translate-x-1/4 -translate-y-1/4">
             {totalItems}
@@ -60,7 +84,7 @@ export function CartDrawer() {
           </button>
         </div>
 
-        {/* Body Content (স্ক্রোলযোগ্য এরিয়া) */}
+        {/* Body Content (স্ক্রোলযোগ্য এরিয়া) */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 py-12">
@@ -70,7 +94,6 @@ export function CartDrawer() {
           ) : (
             cart.map((item, index) => (
               <div key={index} className="flex items-center gap-4 p-3 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors">
-                {/* প্রোডাক্ট ইমেজ */}
                 {item.productImage && (
                   <div className="relative w-16 h-16 bg-white border border-gray-100 rounded-lg p-1 overflow-hidden flex-shrink-0">
                     <Image 
@@ -82,7 +105,6 @@ export function CartDrawer() {
                   </div>
                 )}
                 
-                {/* নাম ও কোয়ান্টিটি */}
                 <div className="flex-grow min-w-0">
                   <h4 className="text-sm font-medium text-gray-800 truncate">{item.productName}</h4>
                   <p className="text-xs text-gray-500 mt-1">
@@ -90,7 +112,6 @@ export function CartDrawer() {
                   </p>
                 </div>
 
-                {/* দাম */}
                 <div className="text-right flex-shrink-0">
                   <span className="text-sm font-bold text-gray-900">
                     ৳{item.totalPrice.toLocaleString()}
@@ -101,9 +122,8 @@ export function CartDrawer() {
           )}
         </div>
 
-        {/* Footer Actions (ফিক্সড সাবটোটাল ও বাটন) */}
+        {/* Footer Actions */}
         <div className="border-t border-gray-200 px-4 py-5 bg-gray-50 flex-shrink-0 space-y-4">
-          {/* লাইভ সাবটোটাল এরিয়া */}
           <div className="flex items-center justify-between text-base font-medium text-gray-900">
             <span>Subtotal</span>
             <span className="text-xl font-bold text-green-600">৳{subtotal.toLocaleString()}</span>
@@ -119,15 +139,15 @@ export function CartDrawer() {
               Continue Shopping
             </button>
             <button 
-              onClick={() => {
-                setIsOpen(false);
-                // এখানে আপনার চেকআউট পেজের রাউটিং বা লজিক লিখতে পারেন
-                alert("Proceeding to checkout!");
-              }}
-              disabled={cart.length === 0}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-green-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm"
+              onClick={handleCheckout} 
+              disabled={cart.length === 0 || isLoading}
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-green-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm min-w-[120px] flex items-center justify-center"
             >
-              Checkout
+              {isLoading ? (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                "Checkout"
+              )}
             </button>
           </div>
         </div>

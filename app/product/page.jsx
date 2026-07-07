@@ -18,7 +18,7 @@ const AllProductPage = async () => {
 
       {/* প্রোডাক্ট কার্ড গ্রিড */}
       <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-        {products?.map((item) => (
+        {products?.reverse().map((item) => (
           <ProductCard key={item._id} item={item} user={user} />
         ))}
       </div>
